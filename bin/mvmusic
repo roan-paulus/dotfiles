@@ -1,0 +1,43 @@
+#! /bin/bash
+
+# Script to distribute music downloaded from yt1z.net to the appropriate directory.
+# Dependency: fzf
+
+# Options
+# ====================
+PREFIX='yt1z.net'
+FROM="$HOME/Downloads"
+TO="$HOME/Music"
+
+# Throw away errors from find since we do nothing when we can't find any files.
+find "$FROM" -type f -name "$PREFIX*" 2> /dev/null | while IFS='\n' read -r file;
+do
+    IFS='-' read _ artist songname <<< $file
+
+    # Strip spaces from front and end
+    STRIP_FRONT='s/^\s*//'
+    STRIP_BACK='s/\s*$//' 
+    artist=$(sed "$STRIP_FRONT" <<< $artist)
+    artist=$(sed "$STRIP_BACK" <<< $artist)
+    songname=$(sed "$STRIP_FRONT" <<< $songname)
+    songname=$(sed "$STRIP_BACK" <<< $songname)
+
+    EXPR='s/\s/-/g'
+    artist=$(sed "$EXPR" <<< $artist)
+    songname=$(sed "$EXPR" <<< $songname)
+
+    echo "Artist: $artist"
+    echo "Songname: $songname"
+
+    # Fuzzy find for an album name.
+    artist_dirname=$(find "$TO" -maxdepth 1 -type d | fzf -i --select-1 -0 --query "$artist")
+    if [ -n "$artist_dirname" ]; then
+        # Remove './' prefix to only get the dirname.
+        artist_dir=$(sed 's/^\.\///' <<< $artist_dirname)
+
+        mv "$file" "$artist_dir/$songname"
+    else
+        mkdir "$TO/$artist" || true
+        mv "$file" "$TO/$artist/$songname"
+    fi
+done
