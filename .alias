@@ -1,0 +1,25 @@
+# Source private variables that should not be commited to dotfiles
+source "./.bash_private"
+
+alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+
+alias ls='ls --color=auto'
+alias ll='ls -l'
+alias la='ls -la'
+alias grep='grep --color=auto'
+alias ssh='TERM=xterm-256color ssh'  # Workaround for ssh with kitty when I can't use kitten ssh
+alias sd="cd ~ && cd \$(find * -type d | fzf)"
+
+# Tmux
+alias t="tmux -u -2"
+alias ta="t attach -t"
+alias tls="t ls"
+alias tn="t new -t"
+
+alias vim='nvim'
+alias headset='echo "connect $HEADSET_MAC" | bluetoothctl'
+alias icat="kitten icat"  # Print images in kitty terminal.
+
+if [ -f "$HOME/work/.alias" ]; then
+    source ~/work/.alias
+fi

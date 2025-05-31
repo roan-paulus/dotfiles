@@ -1,0 +1,14 @@
+[includeIf "gitdir/i:code/"]
+    path = .gitconfig-personal
+[includeIf "gitdir/i:.dotfiles/"]
+    path = .gitconfig-personal
+[includeIf "gitdir/i:work/"]
+    path = .gitconfig-work
+[alias]
+    st = status
+    ci = commit
+    co = checkout
+[push]
+    autoSetupRemote = true
+[init]
+    defaultBranch = master
