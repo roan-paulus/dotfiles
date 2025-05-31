@@ -1,0 +1,12 @@
+#! /bin/bash
+
+# Disable laptop screen if a monitor is connected
+
+set -e
+
+MONITORS=$(hyprctl monitors | grep -P --only-matching '(?<=description: ).*')
+
+if [ $(echo "$MONITORS" | wc -l) -gt 1 ]; then
+    LAPTOP_SCREEN="desc:$(echo "$MONITORS" | head --lines=1)"
+    hyprctl keyword monitor "$LAPTOP_SCREEN, disable"
+fi

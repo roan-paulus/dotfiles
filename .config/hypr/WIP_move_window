@@ -1,0 +1,13 @@
+CLIENTS=$(hyprctl clients -j | 
+    jq  '.[] | select(.class == "firefox")')
+
+get_window() {
+    echo "$CLIENTS" | jq "select(.title | test(\""$1\""; \"i\"))"
+}
+  
+# Specific firefox windows:
+FIREFOX_JQ=$(get_window 'jq')
+FIREFOX_YT=$(get_window 'youtube')
+
+echo $FIREFOX_JQ | jq
+echo $FIREFOX_YT | jq
