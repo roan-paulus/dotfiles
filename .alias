@@ -2,6 +2,8 @@
 source "./.bash_private"
 
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+# Also run this once afterwards:
+# dotfiles config --local status.showUntrackedFiles no
 
 alias ls='ls --color=auto'
 alias ll='ls -l'
