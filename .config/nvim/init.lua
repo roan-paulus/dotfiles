@@ -47,11 +47,15 @@ local keymap_conf = {
 			"Save current file",
 		},
 		["[d"] = {
-			vim.diagnostic.goto_prev,
+			function()
+				vim.diagnostic.jump({ count = -1, float = true })
+			end,
 			"Go to previous [D]iagnostic message",
 		},
 		["]d"] = {
-			vim.diagnostic.goto_next,
+			function()
+				vim.diagnostic.jump({ count = 1, float = true })
+			end,
 			"Go to next [D]iagnostic message",
 		},
 		["<leader>e"] = {
