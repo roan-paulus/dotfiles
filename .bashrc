@@ -4,7 +4,7 @@
 export PATH="$HOME/bin:$PATH"
 export EDITOR='nvim'
 
-source "./.alias"
+source "$HOME/.alias"
 
 sdtm() {
     start_dir="$(pwd)"

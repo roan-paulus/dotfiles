@@ -1,5 +1,5 @@
 # Source private variables that should not be commited to dotfiles
-source "./.bash_private"
+source "$HOME/.bash_private"
 
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 # Also run this once afterwards:
@@ -23,5 +23,5 @@ alias headset='echo "connect $HEADSET_MAC" | bluetoothctl'
 alias icat="kitten icat"  # Print images in kitty terminal.
 
 if [ -f "$HOME/work/.alias" ]; then
-    source ~/work/.alias
+    source $HOME/work/.alias
 fi
