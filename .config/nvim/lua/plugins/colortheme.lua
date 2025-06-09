@@ -1,12 +1,5 @@
 return {
 	{
-		"sho-87/kanagawa-paper.nvim",
-		lazy = false,
-		priority = 1000,
-		opts = {},
-	},
-	{ "catppuccin/nvim", name = "catppuccin", priority = 1000 },
-	{
 		"comfysage/evergarden",
 		priority = 1000,
 		opts = {
@@ -28,4 +21,7 @@ return {
 		},
 	},
 	{ "EdenEast/nightfox.nvim" },
+	{ "f4z3r/gruvbox-material.nvim", opts = {
+		contrast = "hard",
+	} },
 }
