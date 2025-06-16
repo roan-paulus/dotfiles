@@ -108,6 +108,14 @@ local function set_keymaps(conf)
 	end
 end
 
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "typescript",
+	callback = function()
+		vim.keymap.set("n", "<leader>tt", "itest('', () => {<CR>})<Esc>kf'a", { buffer = true })
+		vim.keymap.set("n", "<leader>td", "idescribe('', () => {<CR>})<Esc>kf'a", { buffer = true })
+	end,
+})
+
 set_options(options)
 set_keymaps(keymap_conf)
 

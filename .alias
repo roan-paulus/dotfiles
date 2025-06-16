@@ -11,6 +11,7 @@ alias la='ls -la'
 alias grep='grep --color=auto'
 alias ssh='TERM=xterm-256color ssh'  # Workaround for ssh with kitty when I can't use kitten ssh
 alias sd="cd ~ && cd \$(find * -type d | fzf)"
+alias gfc='git checkout $(git branch | fzf)'
 
 # Tmux
 alias t="tmux -u -2"

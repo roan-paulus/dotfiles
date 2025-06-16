@@ -128,6 +128,7 @@ return {
 				},
 			},
 			ts_ls = {},
+			eslint = {},
 			jsonls = {},
 		}
 		require("mason").setup()
