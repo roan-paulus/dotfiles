@@ -1,43 +1,9 @@
--- LSP Configuration & Plugins
 return {
 	"neovim/nvim-lspconfig",
-	dependencies = {
-		-- Automatically install LSPs and related tools to stdpath for Neovim
-		{ "williamboman/mason.nvim", config = true }, -- NOTE: Must be loaded before dependants
-		"williamboman/mason-lspconfig.nvim",
-		"WhoIsSethDaniel/mason-tool-installer.nvim",
-
-		-- Useful status updates for LSP.
-		-- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-		{ "j-hui/fidget.nvim", opts = {} },
-
-		-- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
-		-- used for completion, annotations and signatures of Neovim apis
-		{ "folke/neodev.nvim", opts = {} },
-
-		-- Rust tools for debugger/lsp and formatters
-		{
-			"mrcjkb/rustaceanvim",
-			version = "^4",
-			lazy = false, -- This plugin is already lazy
-			init = function()
-				vim.g.rustaceanvim = {
-					tools = {
-						enable_clippy = true,
-					},
-					server = {
-						default_settings = {
-							["rust-analyzer"] = {},
-						},
-					},
-				}
-			end,
-		},
-	},
 	config = function()
 		vim.diagnostic.config({
 			underline = true,
-			virtual_text = false,
+			virtual_text = true,
 		})
 
 		vim.api.nvim_create_autocmd("LspAttach", {
@@ -80,12 +46,10 @@ return {
 			end,
 		})
 
-		-- LSP servers and clients are able to communicate to each other what features they support.
-		--  By default, Neovim doesn't support everything that is in the LSP specification.
-		--  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
-		--  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
 		local capabilities = vim.lsp.protocol.make_client_capabilities()
 		capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+		-- The default `on_attach` config provides the `LspEslintFixAll` command that can be used to format a document on save
+		local base_on_attach = vim.lsp.config.eslint.on_attach
 		local servers = {
 			pylsp = {
 				settings = {
@@ -98,29 +62,11 @@ return {
 					},
 				},
 			},
-			-- hls = {
-			-- 	settings = {
-			-- 		{
-			-- 			haskell = {
-			-- 				cabalFormattingProvider = "cabalfmt",
-			-- 				formattingProvider = "stylish-haskell",
-			-- 			},
-			-- 		},
-			-- 	},
-			-- },
 			lua_ls = {
 				settings = {
 					Lua = {
-						workspace = {
-							checkThirdParty = false,
-							-- Make sure love2d is able to be found by the lsp
-							library = { "${3rd}/love2d/library" },
-						},
 						telemetry = { enable = false },
-						completion = {
-							callSnippet = "Replace",
-						},
-						diagnostics = { disable = { "missing-fields", "lowercase-global" } },
+						diagnostics = { globals = { "vim" }, disable = { "lowercase-global" } },
 						format = {
 							enable = false,
 						},
@@ -128,29 +74,24 @@ return {
 				},
 			},
 			ts_ls = {},
-			eslint = {},
-			jsonls = {},
-		}
-		require("mason").setup()
-		local ensure_installed = vim.tbl_keys(servers or {})
-		ensure_installed.hls = nil
-		vim.list_extend(ensure_installed, {
-			"stylua", -- lua formatter
-			-- "rustfmt", Deprecated, install via rustup instead
-		})
-		require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
+			eslint = {
+				on_attach = function(client, bufnr)
+					if not base_on_attach then
+						return
+					end
 
-		require("mason-lspconfig").setup({
-			handlers = {
-				function(server_name)
-					local server = servers[server_name] or {}
-					-- This handles overriding only values explicitly passed
-					-- by the server configuration above. Useful when disabling
-					-- certain features of an LSP (for example, turning off formatting for tsserver)
-					server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
-					require("lspconfig")[server_name].setup(server)
+					base_on_attach(client, bufnr)
+					vim.api.nvim_create_autocmd("BufWritePre", {
+						buffer = bufnr,
+						command = "LspEslintFixAll",
+					})
 				end,
 			},
-		})
+			jsonls = {},
+		}
+		for name, conf in pairs(servers) do
+			vim.lsp.config(name, conf)
+			vim.lsp.enable(name)
+		end
 	end,
 }

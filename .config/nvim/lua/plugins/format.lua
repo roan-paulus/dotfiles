@@ -6,8 +6,10 @@ local formatters_by_ft = {
 	json = { "prettier", "jq", stop_after_first = true },
 }
 
+local js_formatters = { "prettier" }
+
 for _, language in ipairs({ "javascript", "typescript", "javascriptreact", "typescriptreact" }) do
-	formatters_by_ft[language] = { "prettier", "prettierd", stop_after_first = true }
+	formatters_by_ft[language] = js_formatters
 end
 
 return {
@@ -32,11 +34,7 @@ return {
 				lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
 			}
 		end,
-		formatters = {
-			-- Disable using cabal file. I noticed at 30-03-2025 this is incompatible with -
-			-- a version higher then 2.4. Although setting a file to this fixes it, it's still inconvenient.
-			fourmolu = { args = "--no-cabal" },
-		},
+		formatters = {},
 		formatters_by_ft = formatters_by_ft,
 	},
 }
