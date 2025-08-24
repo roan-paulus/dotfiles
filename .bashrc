@@ -35,7 +35,7 @@ bold=$(tput bold)
 reset=$(tput sgr0)
 
 # Load functions for git information.
-. ~/.git-prompt.sh
+source /etc/bash_completion.d/git-prompt
 
 set_ps1() {
     PS1="\[$green\]\w\[$blue\]$(__git_ps1)\[$reset\] > "
@@ -43,9 +43,9 @@ set_ps1() {
 
 PROMPT_COMMAND=set_ps1
 
-source /usr/share/git/completion/git-completion.bash
+source /usr/share/bash-completion/completions/git
 
-export NVM_DIR="$HOME/.config/nvm"
+export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 

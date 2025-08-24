@@ -5,12 +5,12 @@
 
 # Options
 # ====================
-PREFIX='yt1z.net'
+EXT='mp3'
 FROM="$HOME/Downloads"
 TO="$HOME/Music"
 
 # Throw away errors from find since we do nothing when we can't find any files.
-find "$FROM" -type f -name "$PREFIX*" 2> /dev/null | while IFS='\n' read -r file;
+find "$FROM" -type f -name "*.$EXT" 2> /dev/null | while IFS='\n' read -r file;
 do
     IFS='-' read _ artist songname <<< $file
 
@@ -22,7 +22,7 @@ do
     songname=$(sed "$STRIP_FRONT" <<< $songname)
     songname=$(sed "$STRIP_BACK" <<< $songname)
 
-    EXPR='s/\s/-/g'
+    EXPR='s/\s/_/g'
     artist=$(sed "$EXPR" <<< $artist)
     songname=$(sed "$EXPR" <<< $songname)
 

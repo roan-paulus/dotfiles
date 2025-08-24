@@ -1,9 +1,9 @@
 [includeIf "gitdir/i:~/code/"]
-    path = .gitconfig-personal
+    path = .gitconfig_personal
 [includeIf "gitdir/i:~/.dotfiles/"]
-    path = .gitconfig-personal
+    path = .gitconfig_personal
 [includeIf "gitdir/i:~/work/"]
-    path = .gitconfig-work
+    path = .gitconfig_work
 [alias]
     st = status
     ci = commit

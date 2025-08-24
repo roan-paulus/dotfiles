@@ -1,0 +1,172 @@
+#!/bin/bash
+
+set -e
+set -o nounset
+
+# INITIAL SYSTEM SETUP
+# ====================
+
+# SUDO WITHOUT A PASSWORD
+# -----------------------
+
+read -p 'Open a seperate terminal and run sudo visudo and add the following line [Press enter to continue]'
+echo "$USER ALL=(ALL:ALL) NOPASSWD: ALL"
+read -p '[Press enter to continue]'
+
+# Terminal font
+# -------------
+font_install_path="$HOME/Downloads/Hack.zip"
+curl -L -s -o "$font_install_path" 'https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Hack.zip'
+echo "Fetched nerd font: $font_install_path"
+mkdir "$HOME/.fonts"
+unzip "$font_install_path" -d "$HOME/.fonts/"
+# Remove junk.
+rm -rf $HOME/.fonts/README* $HOME/.fonts/LICENSE*
+echo "Added fonts in $HOME/.fonts"
+cat "$HOME/.fonts"
+
+# Make some directories
+# ---------------------
+
+mkdir "$HOME/code" "$HOME/work"
+
+# Create private bash file. The shebang is only used for syntax highlighting.
+echo '#!/bin/bash' > .bash_private
+
+# Setup personal git config.
+read -p 'Personal git config username? ' git_username
+read -p 'Personal git config email? ' git_email
+cat << EOF >> $HOME/.gitconfig_personal
+[user]
+    name = $git_username
+    email = $git_email
+EOF
+
+# INSTALL TOOLS
+# ----------------------
+
+sudo apt install -y jq \
+    keepassxc \ # Password manager. Get your password-store from a backup.
+    fzf
+
+# Install docker
+# --------------
+# https://docs.docker.com/engine/install/debian/
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Post install
+# https://docs.docker.com/engine/install/linux-postinstall/
+
+# Run docker without sudo
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+# Verify installation plus without sudo? docker run hello-world
+
+sudo systemctl enable docker.service
+sudo systemctl enable containerd.service
+
+# Install NVM
+# -----------
+# https://github.com/nvm-sh/nvm
+unset NVM_DIR
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh > "$HOME/nvm_install.sh"
+read -p "Check script $HOME/nvm_install.sh and run it with bash. [Press enter to continue]"
+
+source "$HOME/.bashrc"
+nvm install node
+
+# SETUP SSH KEYS FOR GITHUB
+# =========================
+# https://docs.github.com/en/authentication/connecting-to-github-with-ssh
+
+SSH_PUB_KEY_PATH="$HOME/.ssh/id_ed25519.pub"
+
+set +e
+ls "$SSH_PUB_KEY_PATH"
+set -e
+if [ $? == 2 ]; then
+    echo 'Generating SSH Keys'
+    read -p 'Enter email: ' SSH_EMAIL
+    ssh-keygen -t ed25519 -C "$SSH_EMAIL"
+fi
+
+SSH_PUB_KEY="$(cat $SSH_PUB_KEY)"
+
+echo 'Setting up ssh keys complete, paste the following line into your github keys'
+echo "$SSH_PUB_KEY"
+read -p 'Have you done this? [Hit enter to continue script]'
+
+# SETUP DOTFILES
+# ==============
+# source:         https://www.atlassian.com/git/tutorials/dotfiles
+# sources:source: https://news.ycombinator.com/item?id=11070797, User: StreakyCobra
+
+echo 'Setting up dotfiles...'
+
+git clone --bare git@github.com:roan-paulus/dotfiles.git $HOME/.dotfiles
+function dotfiles {
+   /usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@
+}
+dotfiles config status.showUntrackedFiles no
+set +e
+dotfiles checkout
+set -e
+if [ $? != 0 ]; then
+    mkdir -p .config-backup
+    echo "Backing up pre-existing dot files to $HOME/.config-backup";
+    dotfiles checkout 2>&1 | grep -E "\s+\." | awk {'print $1'} | xargs -I{} mv {} .config-backup/{}
+    dotfiles checkout
+fi
+echo 'Setting up dotfiles completed.'
+
+# NVIM
+# ======================
+
+# Build and install
+# -----------------
+# https://github.com/neovim/neovim/blob/master/BUILD.md
+
+echo 'Installing neovim...'
+
+NEOVIM_BUILD_ESSENTIALS='ninja-build gettext cmake curl build-essential git'
+sudo apt install -y $NEOVIM_BUILD_ESSENTIALS
+
+NEOVIM_PATH="$HOME/neovim"
+git clone --branch=stable https://github.com/neovim/neovim.git --single-branch "$NEOVIM_PATH"
+cd "$NEOVIM_PATH"
+
+make CMAKE_BUILD_TYPE=Release
+
+ARCHITECTURE="$(lscpu | grep -Po '(?<=Architecture:\s{28}).*')"
+cd build && cpack -G DEB && sudo dpkg -i "nvim-linux-$ARCHITECTURE.deb"
+
+if [ -z ${WAYLAND_DISPLAY+x} ]; then
+    sudo apt install -y wl-clipboard
+else
+    echo 'WARNING: no clipboard provider found for neovim, consult :clipboard in nvim for available providers'
+fi
+
+# Install optional dependencies
+# -----------------------------
+sudo apt install -y \
+    ripgrep # External Tools/Telescope
+
+# LSP Dependencies
+# ----------------
+npm i -g vscode-langservers-extracted # Eslint EslintFixAll command. We install eslint in repo context.
+npm install -g typescript typescript-language-server # ts_ls, json, etc...
