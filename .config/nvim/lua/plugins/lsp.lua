@@ -62,6 +62,7 @@ return {
 					},
 				},
 			},
+			-- https://luals.github.io/#other-install
 			lua_ls = {
 				settings = {
 					Lua = {

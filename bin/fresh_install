@@ -47,7 +47,9 @@ EOF
 
 sudo apt install -y jq \
     keepassxc \ # Password manager. Get your password-store from a backup.
-    fzf
+    fzf \
+    nmap \
+    ncat
 
 # Install docker
 # --------------

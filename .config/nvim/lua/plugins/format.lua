@@ -1,4 +1,5 @@
 local formatters_by_ft = {
+	-- https://github.com/JohnnyMorganz/StyLua/releases
 	lua = { "stylua" },
 	python = { "isort", "black" },
 	rust = { "rustfmt" },
