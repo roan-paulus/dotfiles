@@ -49,7 +49,8 @@ sudo apt install -y jq \
     keepassxc \ # Password manager. Get your password-store from a backup.
     fzf \
     nmap \
-    ncat
+    ncat \
+    ripgrep # Also used in nvim telescope plugin
 
 # Install docker
 # --------------
@@ -162,11 +163,6 @@ if [ -z ${WAYLAND_DISPLAY+x} ]; then
 else
     echo 'WARNING: no clipboard provider found for neovim, consult :clipboard in nvim for available providers'
 fi
-
-# Install optional dependencies
-# -----------------------------
-sudo apt install -y \
-    ripgrep # External Tools/Telescope
 
 # LSP Dependencies
 # ----------------
