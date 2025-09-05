@@ -1,1 +1,1 @@
-vim.cmd([[colorscheme kanso-zen]])
+vim.cmd([[colorscheme onedark]])
