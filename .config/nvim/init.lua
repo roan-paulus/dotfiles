@@ -31,6 +31,7 @@ vim.opt.smartcase = true
 vim.opt.undofile = true
 vim.opt.updatetime = 250
 vim.opt.number = true
+vim.opt.wrap = false
 
 vim.keymap.set("n", "<leader>gl", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
 vim.keymap.set("n", "]d", function()

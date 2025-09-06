@@ -1,9 +1,9 @@
 [includeIf "gitdir/i:~/code/"]
-    path = .gitconfig_personal
+    path = "~/.gitconfig_personal"
 [includeIf "gitdir/i:~/.dotfiles/"]
-    path = .gitconfig_personal
+    path = "~/.gitconfig_personal"
 [includeIf "gitdir/i:~/work/"]
-    path = .gitconfig_work
+    path = "~/.gitconfig_work"
 [alias]
     st = status
     ci = commit
@@ -12,3 +12,6 @@
     autoSetupRemote = true
 [init]
     defaultBranch = master
+[user]
+	name = roan-paulus
+	email = roanpaulus@proton.me
