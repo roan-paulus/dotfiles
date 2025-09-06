@@ -1,5 +1,6 @@
-[includeIf "gitdir/i:~/code/"]
-    path = .gitconfig_personal
+[user]
+    name = roan-paulus
+    email = roanpaulus@proton.me
 [includeIf "gitdir/i:~/work/"]
     path = .gitconfig_work
 [alias]
